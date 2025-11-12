@@ -1,0 +1,76 @@
+<div class="page">
+  <a routerLink="/" class="back">← Back</a>
+
+  <h2 *ngIf="mode === 'category' && categoryId !== null">
+    Category #{{ categoryId }} Trivia
+  </h2>
+  <h2 *ngIf="mode === 'random-questions'">Random Questions</h2>
+  <h2 *ngIf="mode === 'random-category'">Random Category</h2>
+
+  <section *ngIf="loading" class="state">Loading questions…</section>
+  <section *ngIf="error" class="state error">
+    {{ error }}
+    <button class="retry" (click)="loadQuestions()">Retry</button>
+  </section>
+
+  <section *ngIf="!loading && !error">
+    <div class="q-list" *ngIf="questions?.length; else empty">
+      <article class="q-card" *ngFor="let q of questions; trackBy: trackByQuestion">
+        <header class="q-head">
+          <div class="q-id">#{{ q.id }}</div>
+          <h3 class="q-title">{{ q.question }}</h3>
+        </header>
+
+        <div *ngIf="q.type === 'multiple' && q.answers?.length" class="q-options">
+          <label
+            class="option"
+            *ngFor="let opt of q.answers"
+          >
+            <input
+              type="radio"
+              [name]="'q_'+q.id"
+              [value]="opt"
+              [checked]="selections[q.id] === opt"
+              (change)="selectMultiple(q.id, opt)"
+            />
+            <span>{{ opt }}</span>
+          </label>
+        </div>
+
+        <div *ngIf="q.type === 'boolean'" class="q-options">
+          <label class="option">
+            <input
+              type="radio"
+              [name]="'q_'+q.id"
+              value="true"
+              [checked]="selections[q.id] === 'true'"
+              (change)="selectBoolean(q.id, true)"
+            />
+            <span>True</span>
+          </label>
+          <label class="option">
+            <input
+              type="radio"
+              [name]="'q_'+q.id"
+              value="false"
+              [checked]="selections[q.id] === 'false'"
+              (change)="selectBoolean(q.id, false)"
+            />
+            <span>False</span>
+          </label>
+        </div>
+      </article>
+    </div>
+
+    <ng-template #empty>
+      <div class="state muted">No questions available.</div>
+    </ng-template>
+  </section>
+
+  <div class="submit-bar" *ngIf="!loading && !error && questions?.length">
+    <div class="summary">
+      Selected {{ selectedCount }} / {{ questions.length }}
+    </div>
+    <button class="submit" [disabled]="!canSubmit()" (click)="submit()">Submit Answers</button>
+  </div>
+</div>

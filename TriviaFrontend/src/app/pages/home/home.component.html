@@ -1,0 +1,52 @@
+<div class="page">
+  <header class="head">
+    <h1>Trivia</h1>
+    <p class="sub">Pick a category or try your luck.</p>
+  </header>
+
+  <section *ngIf="loading" class="state">Loading categories…</section>
+
+  <section *ngIf="!loading">
+    <div class="grid">
+      <article class="card special" (click)="goToRandomQuestions()" role="button" tabindex="0">
+        <div class="card-body">
+          <h3>🎲 Random Questions</h3>
+          <p>Mix of questions across all categories.</p>
+        </div>
+        <div class="card-actions">
+          <button class="btn">Start</button>
+        </div>
+      </article>
+
+      <article class="card special" (click)="goToRandomCategory()" role="button" tabindex="0">
+        <div class="card-body">
+          <h3>✨ Random Category</h3>
+          <p>We’ll pick a category for you.</p>
+        </div>
+        <div class="card-actions">
+          <button class="btn">Surprise me</button>
+        </div>
+      </article>
+
+      <article
+        class="card"
+        *ngFor="let c of categories"
+        (click)="goToCategory(c.id)"
+        role="button"
+        tabindex="0"
+      >
+        <div class="card-body">
+          <h3>{{ c.name }}</h3>
+        
+        </div>
+        <div class="card-actions">
+          <button class="btn">Play</button>
+        </div>
+      </article>
+    </div>
+
+    <div *ngIf="!categories.length" class="state muted">
+      No categories found.
+    </div>
+  </section>
+</div>
