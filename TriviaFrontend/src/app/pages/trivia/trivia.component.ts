@@ -3,6 +3,7 @@ import { ActivatedRoute, ParamMap, Router, RouterLink } from '@angular/router';
 import { NgFor, NgIf } from '@angular/common';
 import { Question } from '../../models/question';
 import { TriviaService } from '../../services/trivia.service';
+import { QuestionAnswer } from '../../models/questionAnswer';
 
 @Component({
   selector: 'app-trivia',
@@ -20,10 +21,16 @@ export class TriviaComponent implements OnInit {
   error: string | null = null;
   questions: Question[] = [];
   selections: Record<string, string> = {};
+  results: Record<string, boolean> = {};
   loading = false;
+  submitted = false;
+
+  questionCount = 5;
+
   get selectedCount(): number {
     return Object.keys(this.selections).length;
   }
+
   constructor(private triviaService: TriviaService) { }
 
   ngOnInit(): void {
@@ -55,7 +62,9 @@ export class TriviaComponent implements OnInit {
     this.selections = {};
     let obs;
     if (this.mode === 'random-questions') {
-      obs = this.triviaService.getRandomQuestions(10);
+      obs = this.triviaService.getRandomQuestions(this.questionCount);
+    } else if (this.mode === 'category' && this.categoryId !== null) {
+      obs = this.triviaService.getQuestionsByCategory(this.categoryId, this.questionCount);
     }
 
     obs?.subscribe({
@@ -78,36 +87,38 @@ export class TriviaComponent implements OnInit {
   }
 
   canSubmit(): boolean {
-    const qCount = this.questions.length;
     const selectedCount = Object.keys(this.selections).length;
-    return qCount > 0 && selectedCount > 0;
+    return selectedCount == this.questionCount;
   }
 
   submit(): void {
     if (!this.canSubmit()) return;
 
-    const payload = {
-      answers: Object.entries(this.selections).map(([questionId, answer]) => ({
-        questionId,
-        answer,
-      })),
-    };
 
-    //this.loading = true;
-    // this.triviaService.submitAnswers(payload).subscribe({
-    //   next: () => {
-    //     this.loading = false;
-    //     // Navigate or toast; for now, simple confirmation.
-    //     alert('Answers submitted! 🎉');
-    //     // Optionally reset:
-    //     // this.selections = {};
-    //   },
-    //   error: (err) => {
-    //     console.error(err);
-    //     this.loading = false;
-    //     this.error = 'Failed to submit answers. Please try again.';
-    //   },
-    // });
+    const payload: QuestionAnswer[] = this.questions.map((q) => {
+      return {
+        questionId: q.id,
+        answer: this.selections[q.id]
+      };
+    });
+
+    this.loading = true;
+    this.triviaService.submitAnswers(payload).subscribe({
+      next: (checkedAnswers: QuestionAnswer[]) => {
+        this.loading = false;
+        this.submitted = true;
+        this.results = {};
+
+        checkedAnswers.forEach(qa => {
+          this.results[qa.questionId] = !!qa.correct;
+        });
+      },
+      error: (err) => {
+        console.error(err);
+        this.loading = false;
+        this.error = 'Failed to submit answers. Please try again.';
+      },
+    });
 
 
   }

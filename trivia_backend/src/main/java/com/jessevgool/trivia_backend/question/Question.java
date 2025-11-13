@@ -1,5 +1,7 @@
 package com.jessevgool.trivia_backend.question;
 
+import java.util.UUID;
+
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -14,7 +16,7 @@ import lombok.extern.jackson.Jacksonized;
 @Getter
 @Setter
 public class Question {
-    String id;
+    UUID id;
     String question;
     String type;
     String[] answers;

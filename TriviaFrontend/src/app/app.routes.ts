@@ -4,7 +4,7 @@ import { HomeComponent } from './pages/home/home.component';
 
 export const routes: Routes = [
     { path: '', component: HomeComponent },
-    { path: 'trivia/category/:id', component: TriviaComponent },
+    { path: 'trivia/category/:categoryId', component: TriviaComponent },
     { path: 'trivia/random-questions', component: TriviaComponent },
     { path: 'trivia/random-category', component: TriviaComponent },
 ];

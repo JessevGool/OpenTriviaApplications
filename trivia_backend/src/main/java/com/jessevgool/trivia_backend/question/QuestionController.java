@@ -25,10 +25,11 @@ public class QuestionController {
 
     @GetMapping("/questions")
     public Object getQuestions(
-            @RequestParam int amount,
+            @RequestParam(defaultValue = "5") int amount,
             @RequestParam(required = false) Integer category,
             @RequestParam(required = false) String difficulty,
-            @RequestParam(required = false) String type) {
-        return triviaService.fetchQuestions(amount);
+            @RequestParam(required = false) String type,
+            @RequestParam(required = false) String token) {
+        return triviaService.fetchQuestions(amount, category, difficulty, type,token);
     }
 }

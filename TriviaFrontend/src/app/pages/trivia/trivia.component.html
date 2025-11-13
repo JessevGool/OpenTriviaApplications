@@ -17,47 +17,32 @@
     <div class="q-list" *ngIf="questions?.length; else empty">
       <article class="q-card" *ngFor="let q of questions; trackBy: trackByQuestion">
         <header class="q-head">
-          <div class="q-id">#{{ q.id }}</div>
-          <h3 class="q-title">{{ q.question }}</h3>
+          <h3 class="q-title" [innerHTML]="q.question"></h3>
         </header>
 
         <div *ngIf="q.type === 'multiple' && q.answers?.length" class="q-options">
-          <label
-            class="option"
-            *ngFor="let opt of q.answers"
-          >
-            <input
-              type="radio"
-              [name]="'q_'+q.id"
-              [value]="opt"
-              [checked]="selections[q.id] === opt"
-              (change)="selectMultiple(q.id, opt)"
-            />
-            <span>{{ opt }}</span>
+          <label class="option" *ngFor="let opt of q.answers">
+            <input type="radio" [name]="'q_'+q.id" [value]="opt" [checked]="selections[q.id] === opt"
+              (change)="selectMultiple(q.id, opt)" />
+            <span [innerHTML]="opt"></span>
           </label>
         </div>
-
         <div *ngIf="q.type === 'boolean'" class="q-options">
           <label class="option">
-            <input
-              type="radio"
-              [name]="'q_'+q.id"
-              value="true"
-              [checked]="selections[q.id] === 'true'"
-              (change)="selectBoolean(q.id, true)"
-            />
+            <input type="radio" [name]="'q_'+q.id" value="true" [checked]="selections[q.id] === 'true'"
+              (change)="selectBoolean(q.id, true)" />
             <span>True</span>
           </label>
           <label class="option">
-            <input
-              type="radio"
-              [name]="'q_'+q.id"
-              value="false"
-              [checked]="selections[q.id] === 'false'"
-              (change)="selectBoolean(q.id, false)"
-            />
+            <input type="radio" [name]="'q_'+q.id" value="false" [checked]="selections[q.id] === 'false'"
+              (change)="selectBoolean(q.id, false)" />
             <span>False</span>
           </label>
+        </div>
+        <div class="q-result" *ngIf="submitted">
+          <span class="badge" [class.correct]="results[q.id]" [class.incorrect]="results[q.id] === false">
+            {{ results[q.id] ? 'Correct ✅' : 'Incorrect ❌' }}
+          </span>
         </div>
       </article>
     </div>
