@@ -9,6 +9,7 @@ import java.util.List;
 
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.jessevgool.trivia_backend.service.TriviaService;
@@ -26,8 +27,11 @@ public class QuestionAnswerController {
     }
 
     @PostMapping("submit")
-    public List<QuestionAnswer> postMethodName(@RequestBody List<QuestionAnswer> answers) {
-        answers.forEach(qa -> qa.setCorrect(triviaService.checkQuestionAnswer(qa.getQuestionId(), qa.getAnswer())));
+    public List<QuestionAnswer> postMethodName(
+        @RequestParam String token,
+        @RequestBody List<QuestionAnswer> answers) {
+        answers.forEach(
+                qa -> qa.setCorrect(triviaService.checkQuestionAnswer(token, qa.getQuestionId(), qa.getAnswer())));
         return answers;
     }
 

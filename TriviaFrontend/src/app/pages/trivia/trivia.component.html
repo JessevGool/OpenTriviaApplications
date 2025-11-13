@@ -2,7 +2,7 @@
   <a routerLink="/" class="back">← Back</a>
 
   <h2 *ngIf="mode === 'category' && categoryId !== null">
-    Category #{{ categoryId }} Trivia
+    Category {{ categoryName }} Trivia
   </h2>
   <h2 *ngIf="mode === 'random-questions'">Random Questions</h2>
   <h2 *ngIf="mode === 'random-category'">Random Category</h2>
@@ -57,5 +57,10 @@
       Selected {{ selectedCount }} / {{ questions.length }}
     </div>
     <button class="submit" [disabled]="!canSubmit()" (click)="submit()">Submit Answers</button>
+
+    <button class="retry" *ngIf="allCorrect" (click)="newQuestions()">
+      Get new questions
+    </button>
+
   </div>
 </div>

@@ -4,6 +4,28 @@
     <p class="sub">Pick a category or try your luck.</p>
   </header>
 
+   <section class="filters">
+    <label>
+      Difficulty:
+      <select [(ngModel)]="difficulty" (ngModelChange)="onDifficultyChange($event)">
+        <option [ngValue]="''">Any</option>
+        <option *ngFor="let d of difficultyOptions" [ngValue]="d">
+          {{ d | titlecase }}
+        </option>
+      </select>
+    </label>
+
+    <label>
+      Type:
+      <select [(ngModel)]="questionType" (ngModelChange)="onTypeChange($event)">
+        <option [ngValue]="''">Any</option>
+        <option *ngFor="let t of typeOptions" [ngValue]="t">
+          {{ t | titlecase }}
+        </option>
+      </select>
+    </label>
+  </section>
+  
   <section *ngIf="loading" class="state">Loading categories…</section>
 
   <section *ngIf="!loading">

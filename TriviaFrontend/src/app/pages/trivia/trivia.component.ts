@@ -2,8 +2,10 @@ import { Component, inject, OnInit } from '@angular/core';
 import { ActivatedRoute, ParamMap, Router, RouterLink } from '@angular/router';
 import { NgFor, NgIf } from '@angular/common';
 import { Question } from '../../models/question';
-import { TriviaService } from '../../services/trivia.service';
+import { TriviaService } from '../../services/trivia/trivia.service';
 import { QuestionAnswer } from '../../models/questionAnswer';
+import { SessionService } from '../../services/session/session.service';
+import { filter, map, switchMap, take } from 'rxjs';
 
 @Component({
   selector: 'app-trivia',
@@ -24,31 +26,65 @@ export class TriviaComponent implements OnInit {
   results: Record<string, boolean> = {};
   loading = false;
   submitted = false;
-
+  token?: string;
   questionCount = 5;
+  categoryName: string | null = null;
 
   get selectedCount(): number {
     return Object.keys(this.selections).length;
   }
 
-  constructor(private triviaService: TriviaService) { }
+  get allCorrect(): boolean {
+    if (!this.submitted || !this.questions.length) return false;
+    return this.questions.every(q => this.results[q.id] === true);
+  }
+
+  constructor(private triviaService: TriviaService, private sessionService: SessionService) { }
 
   ngOnInit(): void {
+    this.sessionService.token$
+      .pipe(
+        filter((t): t is string => !!t),
+        take(1)
+      )
+      .subscribe(token => {
+        this.token = token;
+      });
+
     this.route.paramMap.subscribe((params: ParamMap) => {
       const path = this.router.url;
 
       if (path.startsWith('/trivia/random-questions')) {
         this.mode = 'random-questions';
         this.categoryId = null;
-
-
       } else if (path.startsWith('/trivia/random-category')) {
         this.mode = 'random-category';
-        this.categoryId = null;
+
+        if (this.categoryId === null) {
+          this.triviaService.getCategories()
+            .pipe(take(1))
+            .subscribe(categories => {
+              const random = categories[Math.floor(Math.random() * categories.length)];
+              this.categoryId = random.id;
+              this.categoryName = random.name;
+              this.loadQuestions();
+            });
+        } else {
+          this.loadQuestions();
+        }
+
       } else {
         this.mode = 'category';
         const idStr = params.get('categoryId');
         this.categoryId = idStr ? +idStr : null;
+        this.triviaService.getCategories()
+          .pipe(
+            take(1),
+            map(categories => categories.find(cat => cat.id === this.categoryId))
+          )
+          .subscribe(category => {
+            this.categoryName = category ? category.name : null;
+          });
       }
     });
     this.loadQuestions();
@@ -60,11 +96,13 @@ export class TriviaComponent implements OnInit {
     this.loading = true;
     this.questions = [];
     this.selections = {};
+    this.error = null;
+    this.submitted = false;
     let obs;
     if (this.mode === 'random-questions') {
-      obs = this.triviaService.getRandomQuestions(this.questionCount);
-    } else if (this.mode === 'category' && this.categoryId !== null) {
-      obs = this.triviaService.getQuestionsByCategory(this.categoryId, this.questionCount);
+      obs = this.triviaService.getRandomQuestions(this.questionCount, this.token);
+    } else if ((this.mode === 'category' || this.mode === 'random-category') && this.categoryId !== null) {
+      obs = this.triviaService.getQuestionsByCategory(this.categoryId, this.questionCount, this.token);
     }
 
     obs?.subscribe({
@@ -103,7 +141,7 @@ export class TriviaComponent implements OnInit {
     });
 
     this.loading = true;
-    this.triviaService.submitAnswers(payload).subscribe({
+    this.triviaService.submitAnswers(payload, this.token!).subscribe({
       next: (checkedAnswers: QuestionAnswer[]) => {
         this.loading = false;
         this.submitted = true;
@@ -121,5 +159,9 @@ export class TriviaComponent implements OnInit {
     });
 
 
+  }
+
+  newQuestions(): void {
+    this.loadQuestions();
   }
 }
