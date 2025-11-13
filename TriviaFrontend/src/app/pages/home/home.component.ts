@@ -1,6 +1,6 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { Difficulty, QuestionType, TriviaService } from '../../services/trivia/trivia.service';
-import { OpenTdbCategory } from '../../models/open-tdb-category';
+import { OpenTdbCategory } from '../../models/openTdbCategory';
 import { Router } from '@angular/router';
 import { NgFor, NgIf,TitleCasePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';

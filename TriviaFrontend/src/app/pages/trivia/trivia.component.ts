@@ -5,7 +5,9 @@ import { Question } from '../../models/question';
 import { TriviaService } from '../../services/trivia/trivia.service';
 import { QuestionAnswer } from '../../models/questionAnswer';
 import { SessionService } from '../../services/session/session.service';
-import { filter, map, switchMap, take } from 'rxjs';
+import { filter, map, take } from 'rxjs';
+import { HttpErrorResponse } from '@angular/common/http';
+import { BackendError } from '../../models/backendError';
 
 @Component({
   selector: 'app-trivia',
@@ -38,6 +40,8 @@ export class TriviaComponent implements OnInit {
     if (!this.submitted || !this.questions.length) return false;
     return this.questions.every(q => this.results[q.id] === true);
   }
+
+  trackByQuestion = (_index: number, q: Question) => q.id;
 
   constructor(private triviaService: TriviaService, private sessionService: SessionService) { }
 
@@ -90,7 +94,7 @@ export class TriviaComponent implements OnInit {
     this.loadQuestions();
   }
 
-  trackByQuestion = (_index: number, q: Question) => q.id;
+
 
   loadQuestions(): void {
     this.loading = true;
@@ -99,6 +103,7 @@ export class TriviaComponent implements OnInit {
     this.error = null;
     this.submitted = false;
     let obs;
+
     if (this.mode === 'random-questions') {
       obs = this.triviaService.getRandomQuestions(this.questionCount, this.token);
     } else if ((this.mode === 'category' || this.mode === 'random-category') && this.categoryId !== null) {
@@ -110,8 +115,21 @@ export class TriviaComponent implements OnInit {
         this.questions = questions ?? [];
         this.loading = false;
       },
-      error: () => {
+      error: (err: HttpErrorResponse) => {
         this.loading = false;
+        const backendMessage = typeof err.error === 'string' ? err.error : null;
+        if (err.status === BackendError.RATE_LIMIT) {
+          this.error = backendMessage ?? 'Trivia is temporarily rate limited. Please try again in a moment.';
+        } else if (err.status === BackendError.SESSION_EXPIRED) {
+          //Token expired so we require a new one
+          this.sessionService.clearToken();
+
+          this.error = backendMessage ?? 'Your trivia session expired. Go back to home to start a new game.';
+        } else if (err.status === BackendError.PROVIDER_ERROR) {
+          this.error = backendMessage ?? 'Trivia provider error. Please try again later.';
+        } else {
+          this.error = backendMessage ?? 'Failed to load questions. Please try again.';
+        }
       }
     });
   }

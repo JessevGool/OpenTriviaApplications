@@ -1,6 +1,6 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { OpenTdbCategory } from '../../models/open-tdb-category';
+import { OpenTdbCategory } from '../../models/openTdbCategory';
 import { BehaviorSubject, count, map, Observable, of, tap } from 'rxjs';
 import { Question } from '../../models/question';
 import { QuestionAnswer } from '../../models/questionAnswer';
@@ -44,7 +44,7 @@ export class TriviaService {
     )
   }
 
-  getRandomQuestions(amount: number, token?: string): Observable<any> {
+  getRandomQuestions(amount: number, token?: string): Observable<Question[]> {
     let params = new HttpParams().set('amount', amount);
     const diff = this.difficultySubject.value;
     const type = this.typeSubject.value;
@@ -56,7 +56,7 @@ export class TriviaService {
     return this.http.get<Question[]>(this._baseUrl + "questions", { params });
   }
 
-  getQuestionsByCategory(categoryId: number, amount: number, token?: string): Observable<any> {
+  getQuestionsByCategory(categoryId: number, amount: number, token?: string): Observable<Question[]> {
     let params = new HttpParams()
       .set('amount', amount)
       .set('category', categoryId);
@@ -67,7 +67,7 @@ export class TriviaService {
     if (type) params = params.set('type', type);
     if (token) params = params.set('token', token);
 
-    return this.http.get<Question[]>(this._baseUrl + "questions", { params }); 
+    return this.http.get<Question[]>(this._baseUrl + "questions", { params });
   }
 
   submitAnswers(answers: QuestionAnswer[], token: string): Observable<QuestionAnswer[]> {

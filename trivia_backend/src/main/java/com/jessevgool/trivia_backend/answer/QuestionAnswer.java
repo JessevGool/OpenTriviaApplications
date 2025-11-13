@@ -7,8 +7,10 @@ package com.jessevgool.trivia_backend.answer;
 
 import java.util.UUID;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.extern.jackson.Jacksonized;
 
@@ -20,6 +22,8 @@ import lombok.extern.jackson.Jacksonized;
 @Builder
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class QuestionAnswer {
     UUID questionId;
     String answer;
