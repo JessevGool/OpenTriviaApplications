@@ -14,7 +14,7 @@ export type QuestionType = 'multiple' | 'boolean';
 })
 export class TriviaService {
 
-  private _baseUrl = "http://localhost:8080/"
+  private _baseUrl = "https://abundant-tiff-jessevgool-b70bf725.koyeb.app/"
 
   private difficultySubject = new BehaviorSubject<Difficulty | null>(null);
   private categoriesSubject = new BehaviorSubject<OpenTdbCategory[] | null>(null);

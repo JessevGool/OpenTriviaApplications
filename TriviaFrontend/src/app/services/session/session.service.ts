@@ -7,7 +7,7 @@ import { TriviaState } from '../../models/triviaState';
   providedIn: 'root'
 })
 export class SessionService {
-  private _baseUrl = "http://localhost:8080/"
+  private _baseUrl = "https://abundant-tiff-jessevgool-b70bf725.koyeb.app/"
   private tokenSubject = new BehaviorSubject<string | null>(this.loadTokenFromStorage());
   private readonly TRIVIA_STATE_KEY = 'triviaState';
   token$ = this.tokenSubject.asObservable();
