@@ -20,6 +20,11 @@ public class OpenTdbMetaService {
             .baseUrl("https://opentdb.com")
             .build();
 
+    /**
+     * Fetches trivia categories from the OpenTdb API.
+     * 
+     * @return A list of OpenTdbCategory objects representing trivia categories.
+     */
     @Cacheable("categories")
     public List<OpenTdbCategory> fetchTriviaCategories() {
         OpenTdbCategoryResponse response = restClient.get()

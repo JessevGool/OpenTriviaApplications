@@ -43,7 +43,7 @@ The frontend will be available at:
 http://localhost:4300
 ```
 
-(or at the default `http://localhost:4200` if running manually unless configured otherwise)
+(or at `http://localhost:50000` if running manually)
 
 ### Backend Swagger UI (Spring Boot)
 

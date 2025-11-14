@@ -23,6 +23,10 @@ public class TokenController {
         this.triviaService = triviaService;
     }
 
+    /**
+     * Fetches a new OpenTdb session token.
+     * @return An OpenTdbToken object representing the new session token.
+     */
     @GetMapping("/token")
     public OpenTdbToken getToken() {
         return triviaService.fetchToken();

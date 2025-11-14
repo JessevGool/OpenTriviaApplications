@@ -25,15 +25,26 @@ export class TriviaService {
   categories$ = this.categoriesSubject.asObservable();
   constructor(private http: HttpClient) { }
 
-
+  /**
+   * Sets the difficulty level for trivia questions.
+   * @param diff The desired difficulty level, or null to unset.
+   */
   setDifficulty(diff: Difficulty | null) {
     this.difficultySubject.next(diff);
   }
 
+  /**
+   * Sets the question type for trivia questions.
+   * @param t The desired question type, or null to unset.
+   */
   setType(t: QuestionType | null) {
     this.typeSubject.next(t);
   }
 
+  /**
+   * Retrieves the list of trivia categories.
+   * @returns An Observable emitting an array of OpenTdbCategory objects.
+   */
   getCategories(): Observable<OpenTdbCategory[]> {
     const existing = this.categoriesSubject.value;
     if (existing) {
@@ -44,6 +55,12 @@ export class TriviaService {
     )
   }
 
+  /**
+   * Retrieves a set of random trivia questions.
+   * @param amount The number of questions to retrieve.
+   * @param token An optional session token.
+   * @returns An Observable emitting an array of Question objects.
+   */
   getRandomQuestions(amount: number, token?: string): Observable<Question[]> {
     let params = new HttpParams().set('amount', amount);
     const diff = this.difficultySubject.value;
@@ -56,6 +73,13 @@ export class TriviaService {
     return this.http.get<Question[]>(this._baseUrl + "questions", { params });
   }
 
+  /**
+   * Retrieves trivia questions for a specific category.
+   * @param categoryId The ID of the category.
+   * @param amount The number of questions to retrieve.
+   * @param token An optional session token.
+   * @returns An Observable emitting an array of Question objects.
+   */
   getQuestionsByCategory(categoryId: number, amount: number, token?: string): Observable<Question[]> {
     let params = new HttpParams()
       .set('amount', amount)
@@ -70,6 +94,12 @@ export class TriviaService {
     return this.http.get<Question[]>(this._baseUrl + "questions", { params });
   }
 
+  /**
+   * Submits the user's answers for evaluation.
+   * @param answers An array of QuestionAnswer objects representing the user's answers.
+   * @param token The session token.
+   * @returns An Observable emitting an array of QuestionAnswer objects with results.
+   */
   submitAnswers(answers: QuestionAnswer[], token: string): Observable<QuestionAnswer[]> {
     return this.http.post<QuestionAnswer[]>(this._baseUrl + "submit?token=" + token, answers)
   }

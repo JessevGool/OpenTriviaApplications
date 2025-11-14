@@ -17,8 +17,8 @@ public class OpenTdbCategoryController {
         this.openTdbMetaService = openTdbMetaService;
     }
 
+    // Endpoint to fetch trivia categories from OpenTdb
     @GetMapping("/categories")
     public Object getCategories() {
         return openTdbMetaService.fetchTriviaCategories();
-    
     }}
