@@ -28,7 +28,7 @@ You can also start both applications separately using their standard commands.
 cd TriviaFrontend
 ng serve
 ```
-
+Instructions for installing Angular can be found in [TriviaFrontend/README.md](./TriviaFrontend/README.md)
 #### Start the Spring Boot backend:
 ```
 cd trivia_backend
