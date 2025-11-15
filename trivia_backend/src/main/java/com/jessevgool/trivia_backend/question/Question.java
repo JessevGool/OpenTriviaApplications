@@ -23,7 +23,5 @@ public class Question {
     UUID id;
     String question;
     String type;
-    String[] answers;
-
-    
+    String[] answers; 
 }

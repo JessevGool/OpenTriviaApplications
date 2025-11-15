@@ -1,6 +1,7 @@
 
 package com.jessevgool.trivia_backend.service;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -14,9 +15,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
 
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import com.jessevgool.trivia_backend.exceptions.OpenTdbException;
 import com.jessevgool.trivia_backend.exceptions.OpenTdbRateLimitException;
 import com.jessevgool.trivia_backend.exceptions.OpenTdbTokenException;
+import com.jessevgool.trivia_backend.exceptions.SessionExpiredException;
 import com.jessevgool.trivia_backend.question.OpenTdbQuestion;
 import com.jessevgool.trivia_backend.question.OpenTdbQuestionResponse;
 import com.jessevgool.trivia_backend.question.Question;
@@ -39,7 +43,10 @@ public class TriviaService {
          * question UUID with its correct answer as value.
          * normally, this would be stored in a database or cache.
          */
-        private final Map<String, Map<UUID, String>> answersBySession = new ConcurrentHashMap<>();
+           private final Cache<String, Map<UUID, String>> answersBySession = Caffeine.newBuilder()
+            .expireAfterAccess(Duration.ofMinutes(30))
+            .maximumSize(10_000)
+            .build();
 
         /**
          * Fetches trivia questions from the OpenTdb API and stores the correct answers
@@ -66,8 +73,7 @@ public class TriviaService {
                 OpenTdbQuestion[] openTdbQuestions = response.getResults();
                 Question[] questions = new Question[openTdbQuestions.length];
 
-                Map<UUID, String> answersForSession = answersBySession.computeIfAbsent(token,
-                                id -> new ConcurrentHashMap<>());
+                Map<UUID, String> answersForSession = answersBySession.get(token, k -> new ConcurrentHashMap<>());
 
                 for (int i = 0; i < openTdbQuestions.length; i++) {
                         questions[i] = toQuestion(openTdbQuestions[i], answersForSession);
@@ -120,9 +126,9 @@ public class TriviaService {
          * @return true if the answer is correct, false otherwise.
          */
         public boolean checkQuestionAnswer(String token, UUID questionId, String answer) {
-                Map<UUID, String> answersForSession = answersBySession.get(token);
+                Map<UUID, String> answersForSession = answersBySession.getIfPresent(token);
                 if (answersForSession == null) {
-                        return false;
+                        throw new SessionExpiredException("Session token not found or expired.");
                 }
 
                 String correctAnswer = answersForSession.get(questionId);
@@ -135,7 +141,7 @@ public class TriviaService {
          * @param token The session token identifying the trivia session to be ended.
          */
         public void endSession(String token) {
-                answersBySession.remove(token);
+                answersBySession.invalidate(token);
         }
 
         /**

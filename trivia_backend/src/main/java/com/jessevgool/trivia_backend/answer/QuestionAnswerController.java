@@ -26,17 +26,18 @@ public class QuestionAnswerController {
         this.triviaService = triviaService;
     }
 
-   /**
-    * Handles the submission of question answers for evaluation.
-    * 
-    * @param token OpenTdb session token used to identify the user's session.
-    * @param answers A list of QuestionAnswer objects containing question IDs and user-provided answers.
-    * @return A list of QuestionAnswer objects with updated correctness status.
-    */
+    /**
+     * Handles the submission of question answers for evaluation.
+     * 
+     * @param token   OpenTdb session token used to identify the user's session.
+     * @param answers A list of QuestionAnswer objects containing question IDs and
+     *                user-provided answers.
+     * @return A list of QuestionAnswer objects with updated correctness status.
+     */
     @PostMapping("submit")
     public List<QuestionAnswer> postMethodName(
-        @RequestParam String token,
-        @RequestBody List<QuestionAnswer> answers) {
+            @RequestParam String token,
+            @RequestBody List<QuestionAnswer> answers) {
         answers.forEach(
                 qa -> qa.setCorrect(triviaService.checkQuestionAnswer(token, qa.getQuestionId(), qa.getAnswer())));
         return answers;

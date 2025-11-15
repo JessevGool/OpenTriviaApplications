@@ -1,5 +1,6 @@
 export enum BackendError {
     RATE_LIMIT = 429,
     SESSION_EXPIRED = 400,
+    BACKEND_SESSION_EXPIRED = 410,
     PROVIDER_ERROR = 502
 }
