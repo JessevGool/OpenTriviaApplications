@@ -62,6 +62,6 @@ docker-compose.yml
 Both applications run inside Docker containers and communicate through the Docker network.
 
 # Hosted
-The frontend is currently being hosted at [Trivia](wooden-isabella-jessevgool-7179aac1.koyeb.app/)
+The frontend is currently being hosted at [Trivia](https://wooden-isabella-jessevgool-7179aac1.koyeb.app/)
 
 Don't mind the url (I didn't choose it)
